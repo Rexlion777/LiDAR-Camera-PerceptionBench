@@ -51,3 +51,9 @@ flowchart LR
 ```
 
 通过矩阵化中心距离计算、候选门控和局部 assignment，将 association 从 47.267 ms 优化到 0.836 ms。
+
+## F. 证据资产与可视化
+
+- 18 份机器可读 CSV，共 16,000+ 条实验记录；
+- 16 张作品集图覆盖系统总览、AP/延迟、同帧 CDF、阶段 profiler、资源消融、类别/距离退化、运行质量、tracking 与预测分布；
+- 所有图由 `scripts/portfolio/generate_portfolio_figures.py` 生成，定量结论可回溯到 `evidence/raw/`。

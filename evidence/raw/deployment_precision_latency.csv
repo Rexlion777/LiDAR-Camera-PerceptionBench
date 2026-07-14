@@ -1,0 +1,4 @@
+runtime_variant,core_latency_ms,online_latency_ms
+openpcdet_original,8.021247030046652,33.075552495211014
+wrapper_pytorch,8.021247030046652,33.075552495211014
+trt_backbone_head_only,3.7919312142184936,28.47976247605402

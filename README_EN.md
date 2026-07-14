@@ -15,6 +15,50 @@ An engineering-oriented 3D perception system spanning **KITTI/OpenPCDet data pip
 
 ![Accuracy and deployment](assets/portfolio/02_accuracy_and_deployment.png)
 
+## Engineering innovations and evidence
+
+### 1. Accuracy-preserving deployment acceptance
+
+The deployment study combines official AP parity, matched-frame latency, P50/P95 tails, per-frame speedup, and stage-level profiling. It therefore validates both task behavior and runtime behavior instead of presenting a single best-case timing number.
+
+<p align="center">
+  <img src="assets/portfolio/05_deployment_parity.png" width="49%" alt="TensorRT deployment parity">
+  <img src="assets/portfolio/06_latency_distribution.png" width="49%" alt="Matched-frame latency distribution">
+</p>
+<p align="center">
+  <img src="assets/portfolio/07_per_frame_runtime.png" width="49%" alt="Per-frame runtime behavior">
+  <img src="assets/portfolio/08_stage_profile.png" width="49%" alt="Online stage profiler">
+</p>
+
+### 2. Failure localization beyond aggregate AP
+
+Controlled degradation is decomposed by class, distance, prediction population, confidence, and distribution drift. The resulting evidence can support sensor-health thresholds, data collection priorities, and failure attribution.
+
+<p align="center">
+  <img src="assets/portfolio/10_class_robustness.png" width="49%" alt="Class-level robustness">
+  <img src="assets/portfolio/11_range_robustness.png" width="49%" alt="Range-aware failure heatmap">
+</p>
+<p align="center"><img src="assets/portfolio/12_prediction_health.png" width="72%" alt="Prediction health observability"></p>
+
+### 3. Vectorized association with state auditing
+
+Legacy and vectorized association are replayed on identical detections. Alongside the 56.6× aggregate speedup, the benchmark records matrix workload, gated pairs, visible tracks, and lifecycle events.
+
+<p align="center">
+  <img src="assets/portfolio/13_tracking_latency.png" width="49%" alt="Tracking association latency">
+  <img src="assets/portfolio/14_tracking_lifecycle.png" width="49%" alt="Track lifecycle audit">
+</p>
+
+### 4. Resource-aware and traceable experimentation
+
+Voxel-size ablations connect sparse-tensor density to memory and preprocessing tails; decoded-output studies retain class, confidence, and range structure. All public charts are regenerated from **18 CSV tables containing 16,000+ records**.
+
+<p align="center">
+  <img src="assets/portfolio/09_voxelization_ablation.png" width="49%" alt="Voxelization resource ablation">
+  <img src="assets/portfolio/15_inference_population.png" width="49%" alt="Inference output population">
+</p>
+<p align="center"><img src="assets/portfolio/16_evidence_coverage.png" width="72%" alt="Machine-readable evidence coverage"></p>
+
 ## System capabilities
 
 - **3D perception pipeline:** KITTI I/O, voxelization, PointPillars training/fine-tuning, inference, decode/NMS, official AP, BEV and camera projection.
@@ -32,8 +76,9 @@ An engineering-oriented 3D perception system spanning **KITTI/OpenPCDet data pip
 - **19** reusable runtime modules;
 - **50** experiment, audit, deployment, and reporting scripts;
 - **63** contract and regression test files;
-- **23.1k+** lines of core Python and tests;
-- **10+** machine-readable result tables;
+- **23.5k+** lines of core Python and tests;
+- **18** machine-readable result tables with **16,000+** records;
+- **16** reproducible portfolio figures;
 - reproducible portfolio figures generated from repository evidence by [`generate_portfolio_figures.py`](scripts/portfolio/generate_portfolio_figures.py).
 
 ## Repository map

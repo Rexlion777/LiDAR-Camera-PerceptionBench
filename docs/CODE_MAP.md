@@ -20,8 +20,8 @@
 | `scripts/portfolio/` | 公开图表与系统总览生成器 | 1 generator |
 | `tests/` | 单元测试、合同测试与实验结果回归测试 | 63 files |
 | `configs/` | PointPillars 训练与微调配置 | YAML |
-| `evidence/raw/` | AP、FP/FN、距离分段、标定、延迟与运行质量记录 | 10 CSVs |
-| `assets/portfolio/` | 从结果表重新生成的公开图表 | 4 figures |
+| `evidence/raw/` | AP、FP/FN、距离分段、标定、逐帧延迟与运行质量记录 | 18 CSVs / 16k+ rows |
+| `assets/portfolio/` | 从结果表重新生成的公开图表 | 16 figures |
 
 ## 主要实验入口
 

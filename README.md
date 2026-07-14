@@ -22,6 +22,54 @@
 
 ![准确率与部署性能](assets/portfolio/02_accuracy_and_deployment.png)
 
+## 创新设计与验证
+
+### 创新点 1：从“单点测速”升级为精度守恒的部署验收
+
+项目没有只展示一组平均延迟，而是把 **官方 AP 对齐、同帧配对测速、P50/P95 尾延迟、逐帧加速比和分阶段 profiling** 组成完整部署证据链。这样可以同时回答三个工程问题：模型转为 TensorRT 后是否仍保持任务精度、加速是否覆盖大多数样本、在线瓶颈是否已经从网络前向转移到预处理或后处理。
+
+<p align="center">
+  <img src="assets/portfolio/05_deployment_parity.png" width="49%" alt="TensorRT deployment parity">
+  <img src="assets/portfolio/06_latency_distribution.png" width="49%" alt="Matched-frame latency distribution">
+</p>
+<p align="center">
+  <img src="assets/portfolio/07_per_frame_runtime.png" width="49%" alt="Per-frame runtime behavior">
+  <img src="assets/portfolio/08_stage_profile.png" width="49%" alt="Online stage profiler">
+</p>
+
+### 创新点 2：把退化实验变成可定位的失效分析
+
+压力测试不止报告总体 AP，而是进一步拆到 **类别、距离段、预测数量、置信度与分布漂移**。从结果中可以观察到不同类别对点云稀疏的敏感性明显不同，远距离目标也更早进入失效区间；这些信号可直接用于传感器质量门限、运行告警和数据补采策略。
+
+<p align="center">
+  <img src="assets/portfolio/10_class_robustness.png" width="49%" alt="Class-level robustness">
+  <img src="assets/portfolio/11_range_robustness.png" width="49%" alt="Range-aware failure heatmap">
+</p>
+<p align="center">
+  <img src="assets/portfolio/12_prediction_health.png" width="72%" alt="Prediction health observability">
+</p>
+
+### 创新点 3：面向在线系统的向量化关联与状态审计
+
+将 legacy association 与向量化实现放在同一批检测输入上逐帧重放，除汇总 **56.6×** 加速外，还记录 association matrix、门控后候选对、track 创建/过期和可见轨迹数量。优化因此不仅有速度结论，也保留了复杂度来源和状态一致性的审计入口。
+
+<p align="center">
+  <img src="assets/portfolio/13_tracking_latency.png" width="49%" alt="Tracking association latency">
+  <img src="assets/portfolio/14_tracking_lifecycle.png" width="49%" alt="Track lifecycle audit">
+</p>
+
+### 创新点 4：把模型、输入资源与证据资产统一纳入工程观测
+
+项目补充了 pillar 尺寸对稀疏张量规模、内存和预处理尾延迟的资源消融，同时保留解码检测的类别、置信度与空间分布。公开图表由 **18 份 CSV、16,000+ 条机器可读记录** 重建，展示结果可以回溯到实验数据而非手工绘图。
+
+<p align="center">
+  <img src="assets/portfolio/09_voxelization_ablation.png" width="49%" alt="Voxelization resource ablation">
+  <img src="assets/portfolio/15_inference_population.png" width="49%" alt="Inference output population">
+</p>
+<p align="center">
+  <img src="assets/portfolio/16_evidence_coverage.png" width="72%" alt="Machine-readable evidence coverage">
+</p>
+
 ## 系统能力
 
 ### 1. LiDAR 3D 感知数据管线
@@ -106,8 +154,9 @@ flowchart TB
 | 核心运行模块 | **19** | 标定、坐标变换、tracking、profiling、部署验收、可视化 |
 | 实验与工具脚本 | **50** | 训练、官方评测、退化矩阵、TensorRT bisection、报告生成 |
 | 合同与回归测试 | **63** | 几何、binding、decode、tracking、评测输出与报告结构 |
-| 核心代码与测试 | **23.1k+ LOC** | Python 工程实现 |
-| 机器可读结果表 | **10+** | AP、FP/FN、距离分段、标定偏移、延迟、运行质量 |
+| 核心代码与测试 | **23.5k+ LOC** | Python 工程实现 |
+| 机器可读结果表 | **18 / 16,000+ records** | AP、FP/FN、距离分段、标定偏移、逐帧延迟、运行质量 |
+| 可复现作品集图 | **16** | 全部由仓库证据表与公开样例重新生成 |
 
 ## 代码导航
 

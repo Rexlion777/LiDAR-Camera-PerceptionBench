@@ -1,0 +1,2 @@
+route,trt_core_ms_mean,trt_core_ms_p50,trt_core_ms_p95,pytorch_core_ms_mean,pytorch_core_ms_p50,pytorch_core_ms_p95,preprocess_ms_mean,preprocess_ms_p50,preprocess_ms_p95,nms_postprocess_ms_mean,nms_postprocess_ms_p50,nms_postprocess_ms_p95
+trt_backbone_head_only,3.6351237901399145,3.273592003097292,5.815354557125829,6.7454492506803945,5.614703499304596,9.773042700544462,3.734602386757615,3.4308815011172555,6.3366451948240865,2.2880573446163908,1.8145984940929338,4.095044760470045
