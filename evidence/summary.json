@@ -1,0 +1,37 @@
+{
+  "scope": "public KITTI/OpenPCDet validation only",
+  "official_kitti_validation": {
+    "frames": 3769,
+    "metric": "3D AP moderate",
+    "car": 50.2196,
+    "pedestrian": 23.8978,
+    "cyclist": 45.7720
+  },
+  "tensorrt_boundary": "PyTorch VFE/scatter + TensorRT BEV backbone/dense head + native post-processing",
+  "tensorrt_core_latency_ms": {
+    "pytorch": 6.74545,
+    "tensorrt": 3.63512,
+    "speedup": 1.8556
+  },
+  "online_pipeline_latency_ms": {
+    "pytorch": 33.076,
+    "tensorrt": 28.480
+  },
+  "tracking_association_latency_ms": {
+    "legacy": 47.26654,
+    "optimized": 0.835594,
+    "speedup": 56.56
+  },
+  "deployment_acceptance": {
+    "settings": 107,
+    "executed": 71,
+    "skipped": 7,
+    "partial": 29,
+    "frame_runs": 11200
+  },
+  "calibration_sync_proxy": {
+    "frames": 20,
+    "yaw_2deg_mean_reprojection_shift_px": 30.71,
+    "two_frame_offset_bev_shift_m": "7.64-7.83"
+  }
+}

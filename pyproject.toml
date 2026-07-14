@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lidar-camera-perceptionbench"
+version = "0.1.0"
+description = "LiDAR-camera perception, calibration/sync robustness, and bounded TensorRT deployment evaluation."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "PolyForm-Noncommercial-1.0.0" }
+authors = [{ name = "Rexlion777" }]
+dependencies = ["numpy>=1.24", "scipy>=1.10", "opencv-python-headless>=4.8"]
+
+[project.optional-dependencies]
+visualization = ["matplotlib>=3.7", "pandas>=2.0"]
+dev = ["pytest>=7.4"]
+
+[tool.setuptools.packages.find]
+where = ["runtime"]
+
+[tool.pytest.ini_options]
+pythonpath = ["runtime"]
+testpaths = ["tests"]
+addopts = "-ra"

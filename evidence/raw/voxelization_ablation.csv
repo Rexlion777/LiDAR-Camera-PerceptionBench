@@ -1,0 +1,5 @@
+pillar_size,frame_count,pillar_count_mean,pillar_count_min,pillar_count_max,kept_point_count_mean,preprocess_mean_ms,preprocess_p95_ms,memory_bytes_mean,model_forward_ms,nms_ms,total_latency_mode,detected_box_count,score_distribution
+0.12,20,11211.8,6806,12000,58859.1,7.954220000010537,11.310599999887927,5740441.6,,,preprocess_only,,unavailable_without_model
+0.16,20,10278.1,5035,12000,58859.1,7.858200000191573,11.510500000440516,5262387.2,,,preprocess_only,,unavailable_without_model
+0.2,20,9313.25,3934,12000,58859.1,7.148899999992864,8.231700000578712,4768384.0,,,preprocess_only,,unavailable_without_model
+0.24,20,7959.35,3126,11523,58859.1,7.168535000027987,8.29410000005737,4075187.2,,,preprocess_only,,unavailable_without_model
