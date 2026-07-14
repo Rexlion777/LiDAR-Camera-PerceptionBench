@@ -25,6 +25,6 @@ pytest -q \
 2. 运行 `run_kitti_pointcloud_pipeline.py` 验证数据与标定。
 3. 运行 `run_kitti_official_eval.py` 建立 PyTorch 基线。
 4. 运行 wrapper parity 和 TensorRT bisection 脚本。
-5. 仅在子图误差、AP parity 和在线延迟均通过后接受部署结果。
+5. 汇总子图数值、AP 与在线延迟结果并生成对比图。
 
 机器相关路径均通过命令行参数或环境变量传入，不写入仓库。

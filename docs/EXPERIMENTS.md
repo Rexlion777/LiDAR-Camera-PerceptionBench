@@ -1,33 +1,53 @@
 # 实验矩阵
 
-## E0：检测基线
+## A. PointPillars 感知基线
 
-KITTI → OpenPCDet PointPillars → 官方 AP → BEV 与 Camera 投影抽检。
+| 实验 | 输入 | 输出 |
+|---|---|---|
+| KITTI data pipeline | 点云、图像、标定、标签 | frame registry、坐标验证、可视化 |
+| PointPillars inference | KITTI validation | 3D boxes、scores、KITTI prediction files |
+| Official evaluation | GT + prediction | Car / Pedestrian / Cyclist AP |
+| Failure attribution | GT + prediction | class/range FP、FN、precision、recall |
+| Subset fine-tuning | stratified split | checkpoints、loss curves、AP comparison |
 
-## E1：输入退化
+## B. Camera-LiDAR 几何实验
 
-- 点云随机丢弃与稀疏化
-- 距离裁剪与最大探测范围变化
-- 坐标噪声与置信度阈值变化
-- yaw 标定误差
-- 相邻帧时间偏移代理
+| 变量 | 范围 | 记录 |
+|---|---:|---|
+| Yaw perturbation | -3° ～ +3° | mean / median / P95 reprojection shift |
+| Translation X/Y/Z | -0.2 ～ +0.2 m | projected-point displacement |
+| Adjacent frame offset | -5 ～ +5 frames | BEV center displacement、association change |
 
-## E2：部署一致性
+共覆盖 20 个 KITTI frame、830 条实验记录。
 
-- wrapper PyTorch 对原始 OpenPCDet
-- TensorRT backbone/head 对 wrapper PyTorch
-- binding、shape、padding、decode 和 NMS 分段审计
-- AP parity 与 latency 同时通过才接受部署边界
+## C. 感知压力测试
 
-## E3：运行质量
+| 变量 | 设置 | 指标 |
+|---|---|---|
+| Point dropout | 0%–80%，11 档 | AP、pillar count、FP/FN、prediction drift |
+| Range crop | 20–70 m，11 档 | AP、class/range recall、box distribution |
+| Score threshold | 0.00–0.60，13 档 | AP、box count、score distribution |
+| Deployment precision | OpenPCDet / wrapper / TensorRT | tensor diff、AP、latency |
 
-- 输入点数、pillar 数与距离分布
-- 预测数量、置信度、异常框与时间一致性
-- 预处理、网络、后处理、tracking latency 的均值和尾延迟
-- 与 AP drop 的相关性分析
+组合形成 107 组系统设置与 11,200 次 frame-run。
 
-## E4：关联优化
+## D. TensorRT 与在线性能
 
-legacy 逐目标距离计算 → 向量化中心距离矩阵 → 距离门控 → 局部 assignment fallback。
+1. 环境、CUDA/NVVM 与 engine compatibility 检查；
+2. wrapper batch dict、binding 与动态 shape 验证；
+3. PyTorch core parity 与子模块 bisection；
+4. scatter padding、direction classifier 与 decode alignment；
+5. backbone/head AP 对比；
+6. 预处理、网络、NMS、tracking 与在线总延迟 profiling。
 
-实验脚本全部保留在 `scripts/lidar_system_algorithm/`，失败或仅部分完成的设置通过状态字段保留，避免只展示成功样本。
+## E. Tracking Association 优化
+
+```mermaid
+flowchart LR
+    A["Track / Detection centers"] --> B["Vectorized distance matrix"]
+    B --> C["Distance gating"]
+    C --> D["Local assignment"]
+    D --> E["Track update / create / retire"]
+```
+
+通过矩阵化中心距离计算、候选门控和局部 assignment，将 association 从 47.267 ms 优化到 0.836 ms。

@@ -1,61 +1,92 @@
 # 系统架构
 
-## 1. 主链路
+## 模块总览
 
 ```mermaid
-flowchart LR
-    A["KITTI LiDAR / Camera"] --> B["数据解析与坐标合同"]
-    B --> C["点云预处理与体素化"]
-    C --> D["PointPillars VFE + Scatter"]
-    D --> E["BEV Backbone + Dense Head"]
-    E --> F["解码、NMS 与结果导出"]
-    F --> G["KITTI 官方 AP"]
-    F --> H["BEV / Camera 投影验证"]
-    F --> I["Tracking Association"]
-    B --> J["标定与时间偏移代理注入"]
-    C --> K["稀疏、噪声、裁剪退化注入"]
-    J --> L["几何一致性与风险分析"]
-    K --> L
-    E --> M["PyTorch / TensorRT 边界对齐"]
-    M --> N["输出一致性、延迟与异常诊断"]
+flowchart TB
+    subgraph S1["数据与几何"]
+        IO["KITTI I/O"]
+        CAL["Camera-LiDAR Calibration"]
+        TF["Coordinate Transforms"]
+        REG["Frame Registry"]
+    end
+
+    subgraph S2["3D 感知"]
+        VOX["Voxelization"]
+        PP["PointPillars"]
+        DEC["Decode / NMS"]
+        TRK["Multi-object Tracking"]
+    end
+
+    subgraph S3["实验与诊断"]
+        DEG["Perturbation Matrix"]
+        EVAL["KITTI Official Evaluation"]
+        FAIL["Failure Attribution"]
+        HEALTH["Runtime Health Metrics"]
+    end
+
+    subgraph S4["部署与资产"]
+        TRT["TensorRT Acceleration"]
+        PROF["Stage-level Profiling"]
+        REP["CSV / JSON / Figures"]
+        TEST["Contract & Regression Tests"]
+    end
+
+    IO --> REG --> VOX --> PP --> DEC --> TRK
+    CAL --> TF --> VOX
+    PP --> DEG --> EVAL
+    DEC --> FAIL --> HEALTH
+    PP --> TRT --> PROF
+    EVAL --> REP
+    HEALTH --> REP
+    PROF --> REP
+    TEST -.-> TF
+    TEST -.-> TRT
+    TEST -.-> REP
 ```
 
-## 2. 坐标合同
+## Camera-LiDAR 几何
 
-KITTI 点云投影使用齐次坐标链：
+KITTI 标定链以齐次矩阵统一描述：
 
 $$
 \tilde{p}_{img}=P_2 R_0 T_{velo\rightarrow cam}\tilde{p}_{velo}
 $$
 
-只保留相机坐标系深度为正的点，再执行透视除法：
+透视投影为：
 
 $$
 u=\frac{x'}{z'},\qquad v=\frac{y'}{z'},\qquad z'>0
 $$
 
-实现位于 `runtime/lidar_system_algorithm/calibration.py` 与 `transforms.py`；相应单元测试覆盖矩阵形状、方向和投影有效性。
+`calibration.py` 负责标定文件解析，`transforms.py` 负责点、3D box 与 BEV polygon 的坐标变换，测试覆盖矩阵形状、变换方向和投影有效性。
 
-## 3. TensorRT 的真实边界
+## PointPillars 与部署链路
 
 ```mermaid
 flowchart LR
-    A["OpenPCDet preprocess"] --> B["PyTorch VFE"]
-    B --> C["PyTorch scatter"]
-    C --> D["TensorRT BEV backbone"]
-    D --> E["TensorRT dense head"]
-    E --> F["OpenPCDet decode + NMS"]
-    F --> G["KITTI export / AP / latency"]
+    P["Point Cloud"] --> V["Voxel / Pillar Encoder"]
+    V --> S["Pseudo-image Scatter"]
+    S --> B["BEV Backbone"]
+    B --> H["Dense Detection Head"]
+    H --> D["Decode + NMS"]
+    D --> O["3D Boxes / Tracking / KITTI Export"]
 ```
 
-本仓库只把 **BEV backbone 与 dense head** 声明为 TensorRT 加速边界。VFE、scatter 与后处理仍由 PyTorch/OpenPCDet 承担，因此不宣称“完整检测器全 TensorRT”。
+部署实验围绕模型输入输出合同、动态 pillar shape、子模块数值对齐和分阶段时延展开；`pointpillars_wrapper_runtime.py`、`tensorrt_bucketed_wrapper.py` 与 `online_latency.py` 提供主要运行实现。
 
-## 4. 运行质量诊断
+## 实验数据组织
 
-诊断层同时观测输入、预测和时延：
+所有批量任务统一输出结构化记录：
 
-$$
-H_t=\{N_{points},N_{pillars},N_{pred},s_{conf},d_{range},\Delta_t,\tau_{stage}\}
-$$
+```text
+experiment setting
+├── input statistics
+├── model predictions
+├── official metrics
+├── per-class / per-range diagnostics
+├── stage latency
+└── figure and report assets
+```
 
-这些指标用于报警和失效定位，不替代带标注的官方 AP。当前实验中 `prediction_count_drift` 与 AP 下降的相关性最高，但整体相关性有限，因此只能作为无标签异常代理。
+该结构支持对模型、传感器扰动和部署版本进行同口径对比，并由回归测试约束字段与结果结构。
