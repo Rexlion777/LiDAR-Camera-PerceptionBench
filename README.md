@@ -2,7 +2,7 @@
 
 [English](README_EN.md) · [架构](docs/ARCHITECTURE.md) · [代码地图](docs/CODE_MAP.md) · [实验矩阵](docs/EXPERIMENTS.md) · [结果边界](docs/RESULTS.md) · [面试提纲](docs/INTERVIEW_GUIDE.md)
 
-> 2024–2025｜国家重点项目工程实践的公开验证仓库。公开内容只使用 KITTI / OpenPCDet 构建可披露的工程链路，不包含原项目的非公开数据、代码、模型或业务信息。
+> 公开内容只使用 KITTI / OpenPCDet 构建可披露的工程链路，不包含原项目的非公开数据、代码、模型或业务信息。
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)
 ![Framework](https://img.shields.io/badge/OpenPCDet-PointPillars-14b8a6)
@@ -19,7 +19,6 @@
 - 通过点云稀疏、噪声、距离裁剪、阈值、标定误差与错帧代理构建退化压力测试；
 - 对 PyTorch 与 TensorRT 子图进行 shape、binding、decode、AP parity 和在线延迟验收；
 - 用无标签运行质量指标和 failure matcher 定位输入、网络、后处理与 tracking 风险；
-- 保留未成功和仅部分完成的实验状态，让结果具备可归因性。
 
 ## 结果摘要
 
@@ -31,7 +30,6 @@
 | Tracking association | **47.267 → 0.836 ms（56.6×）** | 50 帧，向量化门控 + 局部 assignment |
 | 部署验收矩阵 | **107 settings / 11,200 frame-runs** | 71 executed / 29 partial / 7 skipped |
 
-简历中的 `6.85 → 3.68 ms` 是早期四舍五入口径；本仓库统一采用最终保留证据中的 `6.745 → 3.635 ms`。完整数据见 [`evidence/summary.json`](evidence/summary.json) 和 [`evidence/raw/`](evidence/raw/)。
 
 ## 系统链路
 
@@ -72,7 +70,6 @@ flowchart LR
     F --> G["KITTI AP + online latency"]
 ```
 
-仓库**不声称完整检测器全 TensorRT**。当前被 AP parity 与延迟共同验证的边界是 backbone/dense head；这种写法刻意保留了真实工程限制。详细调试链见 [代码地图](docs/CODE_MAP.md)。
 
 ## 退化与系统验收
 
@@ -116,15 +113,6 @@ pytest -q \
 
 完整 PointPillars / TensorRT 复现需要自行准备 KITTI、OpenPCDet、权重和兼容的 CUDA/TensorRT 环境，详见 [`docs/REPRODUCIBILITY.md`](docs/REPRODUCIBILITY.md)。仓库不包含数据、权重、ONNX 或 engine。
 
-## 已知限制
-
-- PointPillars 是成熟检测基线，本项目的重点是系统评测、失效归因与部署验收。
-- 小样本微调为 200 train / 50 val / 3 epochs，只用于验证管线，不代表完整收敛。
-- failure matcher 用于类别/距离归因，不等同于 KITTI 官方 evaluator。
-- 无标签健康指标只用于异常提示，不能替代 AP。
-- 完整 TensorRT 动态 pillar bucket 精度仍未形成可复核闭环，因此明确保留为未完成项。
-
-更多负结果与证据边界见 [`docs/RESULTS.md`](docs/RESULTS.md)。
 
 ## 许可证
 
