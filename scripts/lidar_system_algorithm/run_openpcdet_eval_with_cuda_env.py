@@ -26,7 +26,8 @@ def parse_args() -> argparse.Namespace:
 def to_wsl_path(path: Path | str) -> str:
     value = str(path)
     if len(value) > 2 and value[1:3] == ":\\":
-        return f"/mnt/{value[0].lower()}{value[2:].replace('\\', '/')}"
+        suffix = value[2:].replace("\\", "/")
+        return f"/mnt/{value[0].lower()}{suffix}"
     return value.replace("\\", "/")
 
 
